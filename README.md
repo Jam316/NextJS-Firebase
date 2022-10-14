@@ -1,34 +1,47 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Deploy Next.JS App in Firebase using Firebase Cloud Functions
 
-## Getting Started
+Resource:
 
-First, run the development server:
+- [Cloud Function](https://firebase.google.com/docs/functions)
+- [Custom Server](https://nextjs.org/docs/advanced-features/custom-server)
 
-```bash
-npm run dev
-# or
-yarn dev
+### Start Application
+
+Use `npm run deploy` to build files and upload Cloud functions & hosting to Firebase.
+
+### Setup
+
+1. Create server.js file to handle page request
+
+```
+exports.nextServer = functions.https.onRequest((req, res) => {
+  return app.prepare().then(() => handle(req, res));
+});
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Update firebase.json using below codebase. Function name should be the same as your function in server.js
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "nextServer"
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": ".",
+      "runtime": "nodejs16"
+    }
+  ]
+}
+```
